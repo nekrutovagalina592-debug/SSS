@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свидание с собой | Авторский проект</title>
+    
+    <!-- Подключение шрифтов: 
+         Cormorant Garamond для кинематографичных заголовков и логотипа
+         Manrope для чистого и читаемого основного текста -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           ЦВЕТОВАЯ СИСТЕМА И ПЕРЕМЕННЫЕ
+           ========================================================================== */
+        :root {
+            --bg-main: #1E1B1C;         /* глубокий графит */
+            --bg-dark: #161314;         /* угольный графит */
+            --accent-plum: #5C4651;     /* дымчатый сливовый */
+            
+            --text-light: #F5EFE8;      /* молочный */
+            --text-ivory: #E9DED2;      /* теплый айвори */
+            
+            --accent-champagne: #D8C2A8;/* шампань (главный акцент) */
+            --accent-gold: #C8A47A;     /* мягкое золото */
+            --warm-half: #B79E93;       /* пыльный бежево-розовый */
+            --font-heading: 'Cormorant Garamond', serif;
+            --font-text: 'Manrope', sans-serif;
+            
+            --header-height: 80px;
+        }
+        /* ==========================================================================
+           БАЗОВЫЕ НАСТРОЙКИ
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: var(--font-text);
+            background-color: var(--bg-main);
+            /* Создаем сложный, не плоский фон с мягкой глубиной */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(92, 70, 81, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(200, 164, 122, 0.03) 0%, transparent 50%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        ul {
+            list-style: none;
+        }
+        /* Утилиты типографики */
+        h1, h2, h3 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+            line-height: 1.2;
+            color: var(--text-light);
+        }
+        /* ==========================================================================
+           КНОПКИ
+           ========================================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 36px;
+            border-radius: 40px; /* мягкая форма, вытянутый овал */
+            font-family: var(--font-text);
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: var(--accent-champagne);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: #E2D1BC; /* чуть светлее при наведении */
+            transform: translateY(-2px);
+            /* Мягкое теплое свечение низкой интенсивности */
+            box-shadow: 0 8px 25px rgba(216, 194, 168, 0.25);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-ivory);
+            border: 1px solid rgba(183, 158, 147, 0.4); /* деликатная рамка */
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent-champagne);
+            color: var(--accent-champagne);
+            background-color: rgba(216, 194, 168, 0.05);
+        }
+        /* ==========================================================================
+           ХЕДЕР
+           ========================================================================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 100;
+            transition: all 0.5s ease;
+            /* Начальное состояние прозрачное, заполняется при скролле (через JS) */
+        }
+        header.scrolled {
+            height: 64px;
+            background-color: rgba(22, 19, 20, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(183, 158, 147, 0.1);
+        }
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            font-style: italic;
+            color: var(--accent-champagne);
+            letter-spacing: 0.02em;
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        .nav-links a {
+            font-size: 14px;
+            color: var(--text-ivory);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background-color: var(--accent-champagne);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            opacity: 1;
+            color: var(--accent-champagne);
+        }
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        /* Гамбургер меню для мобилок */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        /* ==========================================================================
+           ОБЩАЯ СТРУКТУРА СЕКЦИЙ
+           ========================================================================== */
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 5% 80px;
+            position: relative;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* Анимация появления */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* ==========================================================================
+           ЭКРАН 1: ЗНАКОМСТВО
+           ========================================================================== */
+        #intro .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+        }
+        .intro-text {
+            flex: 0 0 45%;
+        }
+        .intro-text h1 {
+            font-size: 64px;
+            margin-bottom: 24px;
+            color: var(--text-light);
+        }
+        .intro-text h2 {
+            font-size: 24px;
+            font-style: italic;
+            color: var(--accent-champagne);
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+        .intro-text p {
+            font-size: 16px;
+            color: var(--text-ivory);
+            margin-bottom: 48px;
+            opacity: 0.9;
+            max-width: 90%;
+        }
+        .intro-actions {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .intro-media {
+            flex: 0 0 50%;
+            display: flex;
+            justify-content: flex-end;
+            position: relative;
+        }
+        /* Контейнер для hero-фото */
+        .hero-image-wrapper {
+            width: 100%;
+            aspect-ratio: 3/4;
+            max-width: 500px;
+            border-radius: 4px;
+            border: 1px solid rgba(216, 194, 168, 0.15);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .hero-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .hero-image-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(216, 194, 168, 0.05) 0%, transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* ==========================================================================
+           СЕКЦИЯ 2: СВОБОДА ОБРАЗА + ПОЧЕМУ ЭТО ТАК ЛИЧНО (ИНТЕРАКТИВ)
+           ========================================================================== */
+        #freedom {
+            background-color: var(--bg-main);
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 140px;
+        }
+        .freedom-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+        .freedom-header h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .freedom-header p {
+            font-size: 20px;
+            font-style: italic;
+            color: var(--accent-champagne);
+        }
+        /* Созвездие капсул */
+        .constellation {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+            margin-bottom: 100px;
+        }
+        .capsule {
+            padding: 40px 30px;
+            border-radius: 16px;
+            background: rgba(92, 70, 81, 0.05); /* Очень деликатный сливовый подтон */
+            border: 1px solid rgba(216, 194, 168, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+            transition: all 0.5s ease;
+            animation: floatCapsule 6s ease-in-out infinite;
+        }
+        .capsule:hover {
+            background: rgba(216, 194, 168, 0.08);
+            border-color: rgba(216, 194, 168, 0.25);
+            box-shadow: 0 10px 30px rgba(216, 194, 168, 0.05);
+        }
+        .capsule h4 {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+        .capsule p {
+            font-size: 14px;
+            color: var(--text-ivory);
+            opacity: 0.8;
+            font-style: italic;
+        }
+        /* Несимметричная композиция через отступы */
+        .capsule:nth-child(1) { margin-top: 60px; animation-delay: 0s; }
+        .capsule:nth-child(2) { margin-top: -20px; animation-delay: 1s; }
+        .capsule:nth-child(3) { margin-top: 20px; animation-delay: 2s; }
+        .capsule:nth-child(4) { margin-top: -30px; animation-delay: 1.5s; }
+        .capsule:nth-child(5) { margin-top: 50px; animation-delay: 0.5s; }
+        .capsule:nth-child(6) { margin-top: -10px; animation-delay: 2.5s; }
+        @keyframes floatCapsule {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        /* Смысловые опоры (Интерактивный блок) */
+        .freedom-pillars-container {
+            width: 100%;
+            text-align: center;
+            border-top: 1px solid rgba(183, 158, 147, 0.1);
+            padding-top: 80px;
+        }
+        .freedom-pillars-container h3 {
+            font-size: 32px;
+            margin-bottom: 50px;
+            color: var(--accent-champagne);
+        }
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        /* Интерактивная карточка */
+        .pillar {
+            text-align: left;
+            padding: 30px;
+            border-radius: 12px;
+            background: rgba(183, 158, 147, 0.03);
+            border: 1px solid rgba(183, 158, 147, 0.1);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.4s ease;
+            overflow: hidden;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+        }
+        .pillar:hover {
+            border-color: rgba(216, 194, 168, 0.3);
+            background: rgba(216, 194, 168, 0.05);
+        }
+        /* Индикатор возможности клика */
+        .pillar::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-champagne);
+            border-radius: 50%;
+            opacity: 0.4;
+            box-shadow: 0 0 10px var(--accent-champagne);
+            animation: pulseHint 3s infinite;
+        }
+        @keyframes pulseHint {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+        }
+        .pillar.answered::after {
+            animation: none;
+            opacity: 1;
+            box-shadow: 0 0 8px var(--accent-champagne);
+        }
+
+        /* Слои контента */
+        .pillar-content {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .pillar-quiz {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+            background: var(--bg-dark);
+        }
+        .pillar.quiz-open .pillar-content {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .pillar.quiz-open .pillar-quiz {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .pillar h4 {
+            font-family: var(--font-text);
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--accent-gold);
+            margin-bottom: 16px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .pillar p {
+            font-size: 14px;
+            color: var(--text-ivory);
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+        
+        /* Квиз внутри */
+        .quiz-question {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            color: var(--accent-champagne);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quiz-opt {
+            font-size: 13px;
+            padding: 8px 15px;
+            border: 1px solid rgba(216, 194, 168, 0.2);
+            border-radius: 20px;
+            color: var(--text-ivory);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .quiz-opt:hover {
+            border-color: var(--accent-champagne);
+            background: rgba(216, 194, 168, 0.1);
+        }
+
+        /* Кнопка результата */
+        .result-trigger-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.6s ease;
+            margin-top: 20px;
+        }
+        .result-trigger-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .btn-full-width {
+            width: 100%;
+            max-width: 100%;
+            background: transparent;
+            border: 1px solid rgba(216, 194, 168, 0.3);
+            color: var(--accent-champagne);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 13px;
+            padding: 20px;
+            box-shadow: inset 0 0 0px rgba(216, 194, 168, 0);
+        }
+        .btn-full-width:hover {
+            background: rgba(216, 194, 168, 0.05);
+            box-shadow: inset 0 0 20px rgba(216, 194, 168, 0.05);
+            border-color: var(--accent-champagne);
+        }
+
+        /* Слой результата */
+        .personal-result-overlay {
+            margin-top: 30px;
+            padding: 40px;
+            border-radius: 12px;
+            background: rgba(92, 70, 81, 0.05);
+            border: 1px solid rgba(216, 194, 168, 0.15);
+            display: none;
+            animation: fadeInResult 0.8s ease forwards;
+        }
+        @keyframes fadeInResult {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .personal-result-overlay h5 {
+            font-family: var(--font-heading);
+            font-size: 26px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* ==========================================================================
+           СЕКЦИЯ 3: ФОРМАТЫ ВСТРЕЧИ
+           ========================================================================== */
+        #formats {
+            background-color: var(--bg-dark);
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 140px;
+        }
+        .formats-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        .formats-header h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .formats-header p {
+            font-size: 20px;
+            font-style: italic;
+            color: var(--warm-half);
+        }
+        .formats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+        }
+        .format-card {
+            background: rgba(30, 27, 28, 0.4);
+            border: 1px solid rgba(183, 158, 147, 0.1);
+            border-radius: 12px;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s ease;
+            text-align: left;
+        }
+        .format-card:hover {
+            background: rgba(30, 27, 28, 0.7);
+            border-color: rgba(216, 194, 168, 0.3);
+        }
+        .format-card.highlighted {
+            background: rgba(92, 70, 81, 0.08);
+            border-color: rgba(216, 194, 168, 0.25);
+        }
+        .format-card h4 {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+        .format-emotion {
+            font-size: 14px;
+            color: var(--accent-champagne);
+            font-style: italic;
+            margin-bottom: 30px;
+            min-height: 42px;
+        }
+        .format-includes {
+            font-size: 15px;
+            color: var(--text-ivory);
+            opacity: 0.8;
+            flex-grow: 1;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .format-price {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+        .format-card .btn {
+            width: 100%;
+        }
+        /* ==========================================================================
+           ЭКРАН 4: ШАГ НАВСТРЕЧУ
+           ========================================================================== */
+        #step {
+            background-color: var(--bg-dark);
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .step-header {
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        .step-header h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .step-header h3 {
+            font-size: 20px;
+            font-family: var(--font-text);
+            font-weight: 300;
+            color: var(--accent-champagne);
+            margin-bottom: 16px;
+        }
+        .step-header p {
+            font-size: 15px;
+            color: var(--warm-half);
+            font-style: italic;
+        }
+        /* Карусель */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 420px;
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .carousel-card {
+            position: absolute;
+            width: 320px;
+            height: 400px;
+            background: rgba(30, 27, 28, 0.6);
+            border: 1px solid rgba(183, 158, 147, 0.1);
+            border-radius: 12px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card-number {
+            font-family: var(--font-heading);
+            font-size: 14px;
+            color: var(--warm-half);
+            margin-bottom: 20px;
+            letter-spacing: 0.1em;
+        }
+        .carousel-card h4 {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+            transition: color 0.4s ease;
+        }
+        .carousel-card p {
+            font-size: 14px;
+            color: var(--text-ivory);
+            line-height: 1.7;
+            opacity: 0.8;
+            transition: opacity 0.4s ease;
+        }
+        /* Состояния карусели */
+        .carousel-card.active {
+            transform: translateX(0) translateZ(0) scale(1);
+            z-index: 3;
+            border-color: rgba(216, 194, 168, 0.4);
+            background: rgba(30, 27, 28, 0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(216, 194, 168, 0.1);
+        }
+        .carousel-card.active h4 {
+            color: var(--accent-champagne);
+        }
+        .carousel-card.active p {
+            opacity: 1;
+        }
+        .carousel-card.prev {
+            transform: translateX(-60%) translateZ(-150px) rotateY(15deg) scale(0.85);
+            z-index: 2;
+            opacity: 0.4;
+        }
+        .carousel-card.next {
+            transform: translateX(60%) translateZ(-150px) rotateY(-15deg) scale(0.85);
+            z-index: 2;
+            opacity: 0.4;
+        }
+        /* ==========================================================================
+           ЭКРАН 5: ПРИЙТИ НА СВИДАНИЕ
+           ========================================================================== */
+        #date .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+        }
+        .date-media {
+            flex: 0 0 50%;
+            position: relative;
+        }
+        .date-text {
+            flex: 0 0 45%;
+        }
+        .date-text h2 {
+            font-size: 48px;
+            margin-bottom: 24px;
+        }
+        .date-text .call-to-action-line {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            font-style: italic;
+            color: var(--accent-champagne);
+            margin-bottom: 32px;
+            display: block;
+        }
+        .date-text p {
+            font-size: 16px;
+            color: var(--text-ivory);
+            margin-bottom: 48px;
+            opacity: 0.9;
+        }
+        /* Контейнер для видео */
+        .video-wrapper {
+            width: 100%;
+            position: relative;
+            padding-top: 56.25%;
+            background: #000;
+            border: 1px solid rgba(183, 158, 147, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        /* ==========================================================================
+           ФУТЕР
+           ========================================================================== */
+        .site-footer {
+            padding: 60px 5% 40px;
+            background-color: var(--bg-dark);
+            border-top: 1px solid rgba(183, 158, 147, 0.1);
+        }
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-logo {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            font-style: italic;
+            color: var(--accent-champagne);
+        }
+        .footer-nav {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .footer-nav a {
+            font-size: 14px;
+            color: var(--text-ivory);
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .footer-nav a:hover {
+            opacity: 1;
+            color: var(--accent-champagne);
+        }
+        .footer-contacts {
+            font-size: 14px;
+            color: var(--text-ivory);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer-contacts a {
+            color: var(--accent-champagne);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease;
+            padding-bottom: 2px;
+        }
+        .footer-contacts a:hover {
+            border-color: var(--accent-champagne);
+        }
+        .footer-bottom {
+            text-align: center;
+            font-style: italic;
+            color: var(--warm-half);
+            font-size: 14px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(183, 158, 147, 0.05);
+        }
+        /* ==========================================================================
+           АДАПТИВНОСТЬ
+           ========================================================================== */
+        @media (max-width: 1100px) {
+            .nav-links { gap: 24px; }
+        }
+        
+        @media (max-width: 992px) {
+            section { padding: 100px 5% 60px; }
+            .intro-text h1 { font-size: 48px; }
+            .step-header h2 { font-size: 40px; }
+            .date-text h2 { font-size: 40px; }
+            #intro .container, #date .container { flex-direction: column; text-align: center; gap: 40px; }
+            .intro-text, .intro-media, .date-text, .date-media { flex: 1 1 100%; width: 100%; }
+            .intro-actions { justify-content: center; }
+            .intro-media { justify-content: center; }
+            .hero-image-wrapper { max-width: 400px; }
+            #date .container { flex-direction: column-reverse; }
+            .constellation { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .capsule:nth-child(n) { margin-top: 0; }
+            .capsule:nth-child(2n) { margin-top: 30px; }
+            .pillars-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .formats-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+            .format-emotion { min-height: auto; }
+            .footer-top { flex-direction: column; text-align: center; }
+            .footer-nav { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            :root { --header-height: 64px; }
+            .nav-links { display: none; position: absolute; top: var(--header-height); left: 0; width: 100%; background: rgba(22, 19, 20, 0.98); flex-direction: column; align-items: center; padding: 30px 0; gap: 25px; border-bottom: 1px solid rgba(183, 158, 147, 0.1); }
+            .nav-links.mobile-active { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .intro-text h1 { font-size: 38px; }
+            .intro-text h2 { font-size: 20px; }
+            .btn { width: 100%; max-width: 300px; }
+            .intro-actions { flex-direction: column; align-items: center; }
+            .carousel-container { height: 400px; }
+            .carousel-card { width: 280px; height: 360px; padding: 30px 20px; }
+            .carousel-card.prev { transform: translateX(-40%) translateZ(-100px) rotateY(10deg) scale(0.9); }
+            .carousel-card.next { transform: translateX(40%) translateZ(-100px) rotateY(-10deg) scale(0.9); }
+            .freedom-header h2, .formats-header h2 { font-size: 40px; }
+            .freedom-pillars-container h3 { font-size: 28px; }
+            .constellation { grid-template-columns: 1fr; gap: 20px; margin-bottom: 60px; }
+            .capsule:nth-child(n) { margin-top: 0; animation: none; transform: none; }
+            .pillars-grid { grid-template-columns: 1fr; gap: 20px; text-align: center; }
+            .pillar { text-align: center; min-height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <a href="#intro" class="logo">Ириска</a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <span style="display:block; width:24px; height:1px; background:#F5EFE8; margin-bottom:6px;"></span>
+            <span style="display:block; width:24px; height:1px; background:#F5EFE8;"></span>
+        </button>
+        <nav class="nav-links" id="navLinks">
+            <a href="#intro" class="nav-link active">Знакомство</a>
+            <a href="#freedom" class="nav-link">Свобода образа</a>
+            <a href="#formats" class="nav-link">Форматы встречи</a>
+            <a href="#step" class="nav-link">Шаг навстречу</a>
+            <a href="#date" class="nav-link">Прийти на свидание</a>
+        </nav>
+    </header>
+    <main>
+        <section id="intro">
+            <div class="container">
+                <div class="intro-text fade-in">
+                    <h1>Свидание с собой</h1>
+                    <h2>Личная визуальная история о женщине, которой хочется стать ближе к себе.</h2>
+                    <p>Это авторский проект о встрече с той версией себя, которую хочется увидеть, сохранить и полюбить в ней себя по-новому.</p>
+                    <div class="intro-actions">
+                        <a href="https://t.me/Iloveski4" target="_blank" class="btn btn-primary">Прийти на свидание</a>
+                        <a href="#step" class="btn btn-secondary">Шаг навстречу</a>
+                    </div>
+                </div>
+                <div class="intro-media fade-in" style="transition-delay: 0.2s;">
+                    <div class="hero-image-wrapper">
+                        <img src="https://i.yapx.ru/dSOSR.png" alt="[Изображение героини проекта в шляпе]">
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="freedom">
+            <div class="container">
+                <div class="freedom-header fade-in">
+                    <h2>Свобода образа</h2>
+                    <p>Здесь нет жестких рамок, только возможность увидеть разные грани себя</p>
+                </div>
+                <div class="constellation fade-in" style="transition-delay: 0.2s;">
+                    <div class="capsule"><h4>другая ты</h4><p>не выдуманная, а забытая</p></div>
+                    <div class="capsule"><h4>героиня кадра</h4><p>как будто из любимого фильма</p></div>
+                    <div class="capsule"><h4>другая эпоха</h4><p>время, в котором ты звучишь глубже</p></div>
+                    <div class="capsule"><h4>будущая версия</h4><p>та, что уже пришла к себе</p></div>
+                    <div class="capsule"><h4>сказочный образ</h4><p>когда внутреннее становится видимым</p></div>
+                    <div class="capsule"><h4>свободная ты</h4><p>без стеснения, без роли, без оглядки</p></div>
+                </div>
+                <div class="freedom-pillars-container fade-in">
+                    <h3>Почему это так лично</h3>
+                    <div class="pillars-grid">
+                        <!-- Карточка 1 -->
+                        <div class="pillar" data-card="1">
+                            <div class="pillar-content">
+                                <h4>не по шаблону</h4>
+                                <p>каждая история собирается не по готовой схеме, а по настроению, внутреннему образу и тому ощущению, с которым женщина приходит на эту встречу</p>
+                            </div>
+                            <div class="pillar-quiz">
+                                <div class="quiz-question">как часто вам дарят цветы?</div>
+                                <div class="quiz-options">
+                                    <div class="quiz-opt" data-val="1">никогда</div>
+                                    <div class="quiz-opt" data-val="2">иногда</div>
+                                    <div class="quiz-opt" data-val="3">всегда</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Карточка 2 -->
+                        <div class="pillar" data-card="2">
+                            <div class="pillar-content">
+                                <h4>не только красиво</h4>
+                                <p>важно не просто создать выразительный образ, а приблизиться к той версии себя, которая по-настоящему отзывается внутри</p>
+                            </div>
+                            <div class="pillar-quiz">
+                                <div class="quiz-question">как часто вы уделяете время себе?</div>
+                                <div class="quiz-options">
+                                    <div class="quiz-opt" data-val="1">никогда</div>
+                                    <div class="quiz-opt" data-val="2">иногда</div>
+                                    <div class="quiz-opt" data-val="3">всегда</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Карточка 3 -->
+                        <div class="pillar" data-card="3">
+                            <div class="pillar-content">
+                                <h4>с вниманием к тебе</h4>
+                                <p>здесь ценность рождается из нюанса, бережности и авторского взгляда, а не из механической сборки красивой картинки</p>
+                            </div>
+                            <div class="pillar-quiz">
+                                <div class="quiz-question">как часто вы позволяете себе быть разной?</div>
+                                <div class="quiz-options">
+                                    <div class="quiz-opt" data-val="1">никогда</div>
+                                    <div class="quiz-opt" data-val="2">иногда</div>
+                                    <div class="quiz-opt" data-val="3">всегда</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Клавиша результата -->
+                    <div class="result-trigger-container" id="resultTriggerWrap">
+                        <button class="btn btn-full-width" id="showResultBtn">твой отклик</button>
+                    </div>
+
+                    <!-- Оверлей результата -->
+                    <div class="personal-result-overlay" id="personalResult">
+                        <h5 id="resultText"></h5>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="formats">
+            <div class="container">
+                <div class="formats-header fade-in">
+                    <h2>Форматы встречи</h2>
+                    <p>Выбери глубину погружения, которая откликается тебе прямо сейчас.</p>
+                </div>
+                <div class="formats-grid fade-in" style="transition-delay: 0.2s;">
+                    <div class="format-card">
+                        <h4>тихая встреча</h4>
+                        <p class="format-emotion">для первого бережного прикосновения к себе</p>
+                        <p class="format-includes">1 образ, 3–5 финальных кадров, мягкая авторская подача</p>
+                        <div class="format-price">5 900 ₽</div>
+                        <a href="https://t.me/Iloveski4" target="_blank" class="btn btn-secondary">Выбрать формат</a>
+                    </div>
+                    <div class="format-card highlighted">
+                        <h4>встреча в трех версиях</h4>
+                        <p class="format-emotion">когда хочется увидеть себя глубже, в нескольких состояниях</p>
+                        <p class="format-includes">3 образа в единой эстетике, 9–12 финальных кадров, более объемная проработка</p>
+                        <div class="format-price">10 900 ₽</div>
+                        <a href="https://t.me/Iloveski4" target="_blank" class="btn btn-primary">Выбрать формат</a>
+                    </div>
+                    <div class="format-card">
+                        <h4>авторская история</h4>
+                        <p class="format-emotion">для личной визуальной истории, собранной как целый внутренний сюжет</p>
+                        <p class="format-includes">4–5 образов, 15–20 финальных кадров, наиболее глубокая и многослойная работа</p>
+                        <div class="format-price">15 900 ₽</div>
+                        <a href="https://t.me/Iloveski4" target="_blank" class="btn btn-secondary">Выбрать формат</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="step">
+            <div class="container">
+                <div class="step-header fade-in">
+                    <h2>Шаг навстречу</h2>
+                    <h3>Каждая встреча начинается по-разному, но всегда с чего-то очень личного.</h3>
+                    <p>Иногда все начинается с нескольких честных строк.</p>
+                </div>
+                <div class="carousel-container fade-in" style="transition-delay: 0.2s;">
+                    <div class="carousel-card prev" data-index="0"><div class="card-number">01</div><h4>История</h4><p>Ты делишься собой. Присылаешь фото, которое станет основой будущего образа.</p></div>
+                    <div class="carousel-card active" data-index="1"><div class="card-number">02</div><h4>Образ</h4><p>Пишешь несколько строк о том, что трогает, о мечте, настроении или той версии себя, которую хочется увидеть.</p></div>
+                    <div class="carousel-card next" data-index="2"><div class="card-number">03</div><h4>Память</h4><p>Встречаешь новую себя. Получаешь личный визуальный образ, в котором узнается что-то очень твое.</p></div>
+                </div>
+            </div>
+        </section>
+        <section id="date">
+            <div class="container">
+                <div class="date-media fade-in">
+                    <div class="video-wrapper">
+                        <iframe src="https://kinescope.io/embed/ub55SA4PaQqpBThBjZYufU" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="date-text fade-in" style="transition-delay: 0.2s;">
+                    <h2>Позволь себе эту встречу</h2>
+                    <span class="call-to-action-line">Приходи на свидание с собой.</span>
+                    <p>Здесь рождается не просто образ, а личная встреча - с памятью, мечтой, внутренней силой или той нежностью, по которой ты скучала.</p>
+                    <a href="https://t.me/Iloveski4" target="_blank" class="btn btn-primary">Прийти на свидание</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer fade-in">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-logo">Свидание с собой</div>
+                <nav class="footer-nav">
+                    <a href="#intro">Знакомство</a>
+                    <a href="#freedom">Свобода образа</a>
+                    <a href="#formats">Форматы встречи</a>
+                    <a href="#step">Шаг навстречу</a>
+                    <a href="#date">Прийти на свидание</a>
+                </nav>
+                <div class="footer-contacts"><span>Связаться:</span><a href="https://t.me/Iloveski4" target="_blank">Telegram</a></div>
+            </div>
+            <div class="footer-bottom">настоящая красота женщины начинается с внутренней гармонии</div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.getElementById('header');
+            const handleScroll = () => {
+                if (window.scrollY > 50) header.classList.add('scrolled');
+                else header.classList.remove('scrolled');
+            };
+            window.addEventListener('scroll', handleScroll);
+            handleScroll();
+            const cards = Array.from(document.querySelectorAll('.carousel-card'));
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    if (card.classList.contains('active')) return;
+                    const clickedIndex = parseInt(card.getAttribute('data-index'));
+                    let prevIndex = clickedIndex - 1 < 0 ? cards.length - 1 : clickedIndex - 1;
+                    let nextIndex = clickedIndex + 1 >= cards.length ? 0 : clickedIndex + 1;
+                    cards.forEach(c => c.classList.remove('active', 'prev', 'next'));
+                    cards[clickedIndex].classList.add('active');
+                    cards[prevIndex].classList.add('prev');
+                    cards[nextIndex].classList.add('next');
+                });
+            });
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) link.classList.add('active');
+                        });
+                    }
+                });
+            }, { root: null, rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+            sections.forEach(section => sectionObserver.observe(section));
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const fadeObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { root: null, rootMargin: '0px 0px -100px 0px', threshold: 0.1 });
+            fadeElements.forEach(el => fadeObserver.observe(el));
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const navContainer = document.getElementById('navLinks');
+            mobileBtn.addEventListener('click', () => navContainer.classList.toggle('mobile-active'));
+            navLinks.forEach(link => link.addEventListener('click', () => navContainer.classList.remove('mobile-active')));
+
+            // ==========================================
+            // ЛОГИКА ИНТЕРАКТИВНОГО БЛОКА
+            // ==========================================
+            const pillars = document.querySelectorAll('.pillar');
+            const answers = { 1: null, 2: null, 3: null };
+            const triggerWrap = document.getElementById('resultTriggerWrap');
+            const resultOverlay = document.getElementById('personalResult');
+            const resultText = document.getElementById('resultText');
+
+            pillars.forEach(pillar => {
+                const cardId = pillar.getAttribute('data-card');
+                
+                pillar.addEventListener('click', (e) => {
+                    // Если клик не по варианту ответа, открываем/закрываем квиз
+                    if (!e.target.classList.contains('quiz-opt')) {
+                        if (pillar.classList.contains('quiz-open')) {
+                            pillar.classList.remove('quiz-open');
+                        } else {
+                            // Закрываем другие, если открыты
+                            pillars.forEach(p => p.classList.remove('quiz-open'));
+                            pillar.classList.add('quiz-open');
+                        }
+                    }
+                });
+
+                const options = pillar.querySelectorAll('.quiz-opt');
+                options.forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const val = parseInt(opt.getAttribute('data-val'));
+                        answers[cardId] = val;
+                        
+                        pillar.classList.add('answered');
+                        pillar.classList.remove('quiz-open');
+                        
+                        // Проверка на заполнение всех трех
+                        if (Object.values(answers).every(v => v !== null)) {
+                            triggerWrap.classList.add('visible');
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('showResultBtn').addEventListener('click', () => {
+                const values = Object.values(answers);
+                const alwaysCount = values.filter(v => v === 3).length;
+                const sometimesCount = values.filter(v => v === 2).length;
+                
+                let text = "";
+                if (alwaysCount === 3) {
+                    text = "похоже, вы уже умеете быть к себе ближе. И это очень красиво.";
+                } else if (alwaysCount === 1 && sometimesCount === 2) {
+                    text = "в вас уже много света. Возможно, этой встрече просто нужно случиться.";
+                } else {
+                    text = "кажется, пришло время подарить себе чуть больше нежности, внимания и красоты.";
+                }
+
+                resultText.innerText = text;
+                resultOverlay.style.display = 'block';
+                
+                // Прокрутка к результату
+                setTimeout(() => {
+                    resultOverlay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
